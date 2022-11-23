@@ -458,7 +458,8 @@ class TS2Vec:
         #train_data = time_warp(train_data)
         #train_data = window_slice(train_data)
         #train_data = window_warp(train_data)
-        train_data = window_warp(train_data, 0.2)
+        #train_data = window_warp(train_data, 0.05)
+        #train_data = jitter(window_warp(train_data, 0.01), 0.01)
         #############################################################
 
         train_dataset = TensorDataset(torch.from_numpy(train_data).to(torch.float))
@@ -490,7 +491,7 @@ class TS2Vec:
                 # Data Augmentation #
                 #####################
                 # def jitter_(x):
-                #     return x + torch.normal(0, 0.2, x.shape).cuda()
+                #     return x + torch.normal(0., 0.2, x.shape).cuda()
                 
                 # x = jitter_(x.to(self.device))
                 x = x.to(self.device)
@@ -511,6 +512,9 @@ class TS2Vec:
                 out2 = self._net(take_per_row(x, crop_offset + crop_left, crop_eright - crop_left))
                 out2 = out2[:, :crop_l]
                 
+                # out3 = self._net(take_per_row(x, crop_offset + crop_left, crop_right - crop_eleft))
+                # out3 = out3[:, :]
+
                 #####################
                 # Data Augmentation #
                 #####################
@@ -533,6 +537,10 @@ class TS2Vec:
                     out2,
                     temporal_unit=self.temporal_unit
                 )
+
+                # loss = (hierarchical_contrastive_loss(out1, out2, temporal_unit=self.temporal_unit)
+                #     + hierarchical_contrastive_loss(out2, out3, temporal_unit=self.temporal_unit)
+                #     + hierarchical_contrastive_loss(out3, out1, temporal_unit=self.temporal_unit))/3
                 
                 loss.backward()
                 optimizer.step()
@@ -575,7 +583,7 @@ class TS2Vec:
                 out.transpose(1, 2),
                 kernel_size = encoding_window,
                 stride = 1,
-                padding = encoding_window // 2
+                padding = encoding_window // 2 # Max Pool
             ).transpose(1, 2)
             if encoding_window % 2 == 0:
                 out = out[:, :-1]
