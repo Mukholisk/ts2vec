@@ -320,7 +320,7 @@ class TS2Vec:
         train_data = train_data[~np.isnan(train_data).all(axis=2).all(axis=1)]
         #train_data = jitter(train_data[~np.isnan(train_data).all(axis=2).all(axis=1)], 0.2)
         #############################################################
-        # train_data = jitter(train_data, 0.2)
+        #train_data = jitter(train_data, 0.01)
 
         #train_data = scaling(train_data, 1.1)
     
@@ -458,7 +458,7 @@ class TS2Vec:
         #train_data = time_warp(train_data)
         #train_data = window_slice(train_data)
         #train_data = window_warp(train_data)
-        #train_data = window_warp(train_data, 0.05)
+        #rain_data = window_warp(train_data, 0.01)
         #train_data = jitter(window_warp(train_data, 0.01), 0.01)
         #############################################################
 
@@ -491,7 +491,7 @@ class TS2Vec:
                 # Data Augmentation #
                 #####################
                 # def jitter_(x):
-                #     return x + torch.normal(0., 0.2, x.shape).cuda()
+                #     return x + torch.normal(0., 0.01, x.shape).cuda()
                 
                 # x = jitter_(x.to(self.device))
                 x = x.to(self.device)
@@ -583,7 +583,7 @@ class TS2Vec:
                 out.transpose(1, 2),
                 kernel_size = encoding_window,
                 stride = 1,
-                padding = encoding_window // 2 # Max Pool
+                padding = encoding_window // 4 # Max Pool
             ).transpose(1, 2)
             if encoding_window % 2 == 0:
                 out = out[:, :-1]
